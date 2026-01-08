@@ -18,6 +18,11 @@ const connectToDatabase = async () => {
   try {
     await connectDB();
     console.log('✅ Database connected successfully');
+    
+    // Seed sample data if needed
+    const seedData = require('./seed-data');
+    await seedData();
+    
   } catch (error) {
     console.error('❌ Database connection failed:', error);
     // Don't exit in serverless environment

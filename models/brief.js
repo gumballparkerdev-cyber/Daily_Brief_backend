@@ -15,4 +15,5 @@ const briefSchema = new mongoose.Schema({
     default: true,
   },
 });
+
 module.exports = mongoose.model("Brief", briefSchema);

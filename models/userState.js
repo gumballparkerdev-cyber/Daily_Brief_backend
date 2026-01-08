@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const userStateSchema = new mongoose.Schema({
     sessionId: {
-        type : String,
-        required : true,
-        unique : true,
+        type: String,
+        required: true,
+        unique: true,
     },
 
     streak: {
@@ -25,9 +25,11 @@ const userStateSchema = new mongoose.Schema({
         type: String,
         enum: ['easy', 'normal', 'hard'],
     },
+    
     lastActionDate: {
         type: Date,
     },
+    
     lastActionType: {
         type: String,
         enum: ['done', 'skip'],
