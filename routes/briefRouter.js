@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Brief = require("../models/brief");
-const UserState = require("../models/UserState");
+const UserState = require("../models/userState");
 const sessionMiddleware = require("../middleware/session");
 
 // helper: check if two dates are same day

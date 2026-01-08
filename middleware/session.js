@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const UserState = require("../models/UserState");
+const UserState = require("../models/userState");
 
 module.exports = async (req, res, next) => {
   try {
