@@ -5,7 +5,7 @@ try {
   const Brief = require('./models/Brief');
   console.log('✅ Brief model imported successfully');
   
-  const UserState = require('./models/userState');
+  const UserState = require('./models/UserState');
   console.log('✅ UserState model imported successfully');
   
   console.log('🎉 All models imported successfully!');
