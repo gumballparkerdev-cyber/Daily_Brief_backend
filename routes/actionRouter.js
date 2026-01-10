@@ -1,44 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require('mongoose');
 
-
-// Inline UserState model to avoid import issues
-const userStateSchema = new mongoose.Schema({
-    sessionId: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    streak: {
-        type: Number,
-        default: 0,
-    },
-    lastBriefId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Brief', 
-    },
-    lastBriefDate: {
-        type: Date,
-    },
-    lastDifficulty: {
-        type: String,
-        enum: ['easy', 'normal', 'hard'],
-    },
-    lastActionDate: {
-        type: Date,
-    },
-    lastActionType: {
-        type: String,
-        enum: ['done', 'skip'],
-    },
-});
-
-const UserState = mongoose.models.userState || mongoose.model('userState', userStateSchema);
-
+const UserState = require("../models/UserState");
 const sessionMiddleware = require("../middleware/session");
 
-// helper
+// helper: check if two dates are same day
 const isSameDay = (a, b) => {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -63,19 +29,25 @@ router.post("/done", sessionMiddleware, async (req, res) => {
 
     // already done today
     if (userState.lastActionType === "done") {
-      return res.json({ status: "already_done", streak: userState.streak });
+      return res.json({
+        status: "already_done",
+        streak: userState.streak,
+      });
     }
 
-    // Allow completion after skipping - user can skip then complete
+    // complete task
     userState.streak += 1;
     userState.lastActionType = "done";
     userState.lastActionDate = today;
 
     await userState.save();
 
-    res.json({ status: "ok", streak: userState.streak });
+    res.json({
+      status: "ok",
+      streak: userState.streak,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("DONE ROUTE ERROR:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -94,20 +66,24 @@ router.post("/skip", sessionMiddleware, async (req, res) => {
       return res.status(400).json({ error: "No brief to skip today" });
     }
 
-    // prevent skip after done (but allow multiple skips)
+    // prevent skip after done
     if (userState.lastActionType === "done") {
-      return res.status(400).json({ error: "Cannot skip after completing task" });
+      return res
+        .status(400)
+        .json({ error: "Cannot skip after completing task" });
     }
 
-    // Allow multiple skips - don't check if already skipped
     userState.lastActionType = "skip";
     userState.lastActionDate = today;
 
     await userState.save();
 
-    res.json({ status: "ok", streak: userState.streak });
+    res.json({
+      status: "ok",
+      streak: userState.streak,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("SKIP ROUTE ERROR:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
