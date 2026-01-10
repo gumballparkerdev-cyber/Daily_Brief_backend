@@ -34,7 +34,7 @@ const userStateSchema = new mongoose.Schema({
     },
 });
 
-const UserState = mongoose.models.UserState || mongoose.model('UserState', userStateSchema);
+const UserState = mongoose.models.userState || mongoose.model('userState', userStateSchema);
 
 const sessionMiddleware = require("../middleware/session");
 

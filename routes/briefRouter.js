@@ -1,59 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require('mongoose');
 
-
-// Inline UserState model to avoid import issues
-const userStateSchema = new mongoose.Schema({
-    sessionId: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    streak: {
-        type: Number,
-        default: 0,
-    },
-    lastBriefId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Brief', 
-    },
-    lastBriefDate: {
-        type: Date,
-    },
-    lastDifficulty: {
-        type: String,
-        enum: ['easy', 'normal', 'hard'],
-    },
-    lastActionDate: {
-        type: Date,
-    },
-    lastActionType: {
-        type: String,
-        enum: ['done', 'skip'],
-    },
-});
-
-// Inline Brief model to avoid import issues
-const briefSchema = new mongoose.Schema({
-  text: {
-    type: String,
-    required: true,
-  },
-  difficulty: {
-    type: String,
-    enum: ["easy", "normal", "hard"],
-    required: true,
-  },
-  active: {
-    type: Boolean,
-    default: true,
-  },
-});
-
-const Brief = mongoose.models.Brief || mongoose.model("Brief", briefSchema);
-const UserState = mongoose.models.UserState || mongoose.model('UserState', userStateSchema);
-
+const Brief = require("../models/Brief");
+const UserState = require("../models/userState");
 const sessionMiddleware = require("../middleware/session");
 
 // helper: check if two dates are same day
