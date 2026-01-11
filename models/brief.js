@@ -16,4 +16,4 @@ const briefSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Brief", briefSchema);
+module.exports = mongoose.model("brief", briefSchema);
