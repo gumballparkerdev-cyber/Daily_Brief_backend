@@ -84,7 +84,7 @@ router.get("/", sessionMiddleware, async (req, res) => {
 
     // 6. Save state for NEW brief
     userState.lastBriefId = brief._id;
-    userState.lastActionDate = today;   // brief exists today
+    userState.lastBriefDate = today;   // brief exists today
     userState.lastActionType = null;    // 🔑 reset action
     userState.lastDifficulty = difficulty;
 

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-const UserState = require("../models/UserState");
 const sessionMiddleware = require("../middleware/session");
 
 // helper: check if two dates are same day
@@ -19,12 +18,12 @@ router.post("/done", sessionMiddleware, async (req, res) => {
     const userState = req.userState;
     const today = new Date();
 
-    // no brief today
+    // no brief served today
     if (
-      !userState.lastActionDate ||
-      !isSameDay(new Date(userState.lastActionDate), today)
+      !userState.lastBriefDate ||
+      !isSameDay(new Date(userState.lastBriefDate), today)
     ) {
-      return res.status(400).json({ error: "No brief to complete today" });
+      return res.status(400).json({ error: "No brief to act on today" });
     }
 
     // already done
@@ -57,12 +56,12 @@ router.post("/skip", sessionMiddleware, async (req, res) => {
     const userState = req.userState;
     const today = new Date();
 
-    // no brief today
+    // no brief served today
     if (
-      !userState.lastActionDate ||
-      !isSameDay(new Date(userState.lastActionDate), today)
+      !userState.lastBriefDate ||
+      !isSameDay(new Date(userState.lastBriefDate), today)
     ) {
-      return res.status(400).json({ error: "No brief to skip today" });
+      return res.status(400).json({ error: "No brief to act on today" });
     }
 
     // prevent skip after done
