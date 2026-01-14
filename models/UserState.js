@@ -36,4 +36,4 @@ const userStateSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('UserState', userStateSchema);
+module.exports =   mongoose.models.UserState || mongoose.model('UserState', userStateSchema);
