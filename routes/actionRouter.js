@@ -13,13 +13,13 @@ const isSameDay = (a, b) => {
   );
 };
 
-// DONE ACTION
+// DONE
 router.post("/done", sessionMiddleware, async (req, res) => {
   try {
     const userState = req.userState;
     const today = new Date();
 
-    // no brief served today
+    // no brief today
     if (
       !userState.lastActionDate ||
       !isSameDay(new Date(userState.lastActionDate), today)
@@ -27,7 +27,7 @@ router.post("/done", sessionMiddleware, async (req, res) => {
       return res.status(400).json({ error: "No brief to complete today" });
     }
 
-    // already done today
+    // already done
     if (userState.lastActionType === "done") {
       return res.json({
         status: "already_done",
@@ -35,7 +35,6 @@ router.post("/done", sessionMiddleware, async (req, res) => {
       });
     }
 
-    // complete task
     userState.streak += 1;
     userState.lastActionType = "done";
     userState.lastActionDate = today;
@@ -52,13 +51,13 @@ router.post("/done", sessionMiddleware, async (req, res) => {
   }
 });
 
-// SKIP ACTION
+// SKIP
 router.post("/skip", sessionMiddleware, async (req, res) => {
   try {
     const userState = req.userState;
     const today = new Date();
 
-    // no brief served today
+    // no brief today
     if (
       !userState.lastActionDate ||
       !isSameDay(new Date(userState.lastActionDate), today)

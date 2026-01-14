@@ -25,9 +25,7 @@ const getDifficulty = (userState) => {
   }
 
   // streak 30+
-  if (lastDifficulty === "hard") {
-    return "normal";
-  }
+  if (lastDifficulty === "hard") return "normal";
 
   return Math.random() < 0.2 ? "hard" : "normal";
 };
@@ -37,36 +35,38 @@ router.get("/", sessionMiddleware, async (req, res) => {
     const userState = req.userState;
     const today = new Date();
 
-// 1. Lock brief only if user DONE today
-if (
-  userState.lastActionDate &&
-  isSameDay(new Date(userState.lastActionDate), today) &&
-  userState.lastActionType === 'done'
-) {
-  const existingBrief = await Brief.findById(userState.lastBriefId);
-  return res.json({ 
-    brief: existingBrief,
-    userState: {
-      streak: userState.streak,
-      lastActionType: userState.lastActionType,
-      actionCompleted: true
+    // 1. Lock brief ONLY if user already completed today
+    if (
+      userState.lastBriefId &&
+      userState.lastActionDate &&
+      isSameDay(new Date(userState.lastActionDate), today) &&
+      userState.lastActionType === "done"
+    ) {
+      const existingBrief = await Brief.findById(userState.lastBriefId);
+
+      return res.json({
+        brief: existingBrief,
+        userState: {
+          streak: userState.streak,
+          lastActionType: userState.lastActionType,
+          actionCompleted: true,
+        },
+      });
     }
-  });
-}
 
     // 2. Decide difficulty
     const difficulty = getDifficulty(userState);
 
-    // 3. Find random briefs with proper difficulty, excluding recent ones
+    // 3. Find briefs (exclude last one)
     const excludeIds = userState.lastBriefId ? [userState.lastBriefId] : [];
-    
+
     let briefs = await Brief.find({
       difficulty,
       active: true,
       _id: { $nin: excludeIds },
     });
 
-    // 4. Fallback if nothing found
+    // 4. Fallback to easy
     if (briefs.length === 0 && difficulty !== "easy") {
       briefs = await Brief.find({
         difficulty: "easy",
@@ -79,33 +79,33 @@ if (
       return res.status(404).json({ error: "No brief available" });
     }
 
-    // 5. Select random brief from available ones
-    const randomIndex = Math.floor(Math.random() * briefs.length);
-    const brief = briefs[randomIndex];
+    // 5. Pick random brief
+    const brief = briefs[Math.floor(Math.random() * briefs.length)];
 
-    // 6. Save state (only update lastBriefId, don't change action state for skips)
+    // 6. Save state for NEW brief
     userState.lastBriefId = brief._id;
-    userState.lastActionDate = today;
+    userState.lastActionDate = today;   // brief exists today
+    userState.lastActionType = null;    // 🔑 reset action
     userState.lastDifficulty = difficulty;
+
     await userState.save();
 
     res.json({
       brief: {
         id: brief._id,
         text: brief.text,
-        difficulty: difficulty,
+        difficulty,
       },
       userState: {
         streak: userState.streak,
-        lastActionType: userState.lastActionType,
-        actionCompleted: userState.lastActionType === 'done'
-      }
+        lastActionType: null,
+        actionCompleted: false,
+      },
     });
-} catch (err) {
-  console.error("BRIEF ROUTE ERROR:", err);
-  res.status(500).json({ error: err.message });
-}
-
+  } catch (err) {
+    console.error("BRIEF ROUTE ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
