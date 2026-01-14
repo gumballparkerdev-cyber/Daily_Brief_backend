@@ -83,12 +83,14 @@ router.get("/", sessionMiddleware, async (req, res) => {
     const brief = briefs[Math.floor(Math.random() * briefs.length)];
 
     // 6. Save state for NEW brief
-    userState.lastBriefId = brief._id;
-    userState.lastBriefDate = today;   // brief exists today
-    userState.lastActionType = null;    // 🔑 reset action
-    userState.lastDifficulty = difficulty;
+  userState.lastBriefId = brief._id;
+userState.lastBriefDate = today; // 🔥 THIS WAS MISSING
+userState.lastActionDate = today;
+userState.lastDifficulty = difficulty;
+userState.lastActionType = null; // reset action for the day
 
-    await userState.save();
+await userState.save();
+
 
     res.json({
       brief: {
