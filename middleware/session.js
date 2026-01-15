@@ -8,10 +8,11 @@ module.exports = async (req, res, next) => {
     // 1. Create session if missing
     if (!sessionId) {
       sessionId = uuidv4();
-      res.cookie("sessionId", sessionId, {
-        httpOnly: true,
-        sameSite: "strict",
-      });
+    res.cookie("sessionId", sessionId, {
+  httpOnly: true,
+  sameSite: "none",
+  secure: true,
+  });
     }
 
     // 2. Find or create user state
